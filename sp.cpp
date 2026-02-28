@@ -1,11 +1,16 @@
 #include <iostream>
 #include <vector>
+#include <chrono>
 #include "config.hpp"
 
 int main() {
 
     auto a = create_matrix();
-    read_input(a, M, N, P);                      // sequential fill
+    read_input(a, M, N, P);   
+
+    using clock = std::chrono::steady_clock;
+
+    auto t0 = clock::now();
 
     int min_i=0, min_j=0, min_k=0;
     int max_i=0, max_j=0, max_k=0;
@@ -29,6 +34,11 @@ int main() {
         }
     }
 
+    auto t1 = clock::now();
+    std::chrono::duration<double> sec = t1 - t0;
+
+    std::cout << "Elapsed: " << sec.count() << " s\n";
+    
     std::cout << "Min: " << a[min_i][min_j][min_k] << " at (" << min_i << "," << min_j << "," << min_k << ")" << std::endl;
     std::cout << "Max: " << a[max_i][max_j][max_k] << " at (" << max_i << "," << max_j << "," << max_k << ")" << std::endl;
 

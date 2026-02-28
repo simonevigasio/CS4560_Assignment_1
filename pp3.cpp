@@ -2,28 +2,29 @@
 #include <vector>
 #include <omp.h>
 #include <algorithm>
+#include <chrono>
 #include "config.hpp"
 
 int main() {
     
     auto a = create_matrix();
-    read_input(a, M, N, P); // SEQUENZIALE
+    read_input(a, M, N, P); 
+
+    int T = 16;                         
+    omp_set_dynamic(0);                
+    omp_set_num_threads(T);            
+    omp_set_max_active_levels(2);      
+
+    int outer_threads = 2;
+    int inner_threads = std::max(1, T / outer_threads); // T/2
+
+    using clock = std::chrono::steady_clock;
+
+    auto t0 = clock::now();
 
     int maxval = a[0][0][0], minval = a[0][0][0];
     int max_i=0, max_j=0, max_k=0;
     int min_i=0, min_j=0, min_k=0;
-
-    // ======= Qui scegli T = 2,4,8,16 in un loop di benchmark =======
-    int T = 8;                         // esempio
-    omp_set_dynamic(0);                // non far cambiare T al runtime
-    omp_set_num_threads(T);            // imposta default threads per "parallel"
-    omp_set_max_active_levels(2);      // abilita nested parallelism
-
-    // Distribuzione controllata dei thread:
-    int outer_threads = 2;
-    int inner_threads = std::max(1, T / outer_threads); // T/2
-
-    double t0 = omp_get_wtime();
 
     #pragma omp parallel sections num_threads(outer_threads) default(none) \
         shared(a,M,N,P,maxval,minval,max_i,max_j,max_k,min_i,min_j,min_k,inner_threads)
@@ -77,9 +78,11 @@ int main() {
         }
     }
 
-    double t1 = omp_get_wtime();
+    auto t1 = clock::now();
+    std::chrono::duration<double> sec = t1 - t0;
 
-    std::cout << "T=" << T << " time=" << (t1 - t0) << " s\n";
+    std::cout << "Elapsed: " << sec.count() << " s\n";
+
     std::cout << "Min: " << minval << " at ("<<min_i<<","<<min_j<<","<<min_k<<")\n";
     std::cout << "Max: " << maxval << " at ("<<max_i<<","<<max_j<<","<<max_k<<")\n";
 }

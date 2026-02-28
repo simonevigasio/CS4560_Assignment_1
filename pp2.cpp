@@ -2,12 +2,21 @@
 #include <vector>
 #include <climits>
 #include <omp.h>
+#include <chrono>
 #include "config.hpp"
 
 int main() {
     
     auto a = create_matrix();
-    read_input(a, M, N, P); // sequential
+    read_input(a, M, N, P); 
+
+    int T = 8;                        
+    omp_set_dynamic(0);                
+    omp_set_num_threads(T);           
+    
+    using clock = std::chrono::steady_clock;
+
+    auto t0 = clock::now();
 
     // results
     int min_val = INT_MAX, max_val = INT_MIN;
@@ -58,6 +67,11 @@ int main() {
         }
     } // implicit barrier at end of parallel region ensures both sections finished
 
+    auto t1 = clock::now();
+    std::chrono::duration<double> sec = t1 - t0;
+
+    std::cout << "Elapsed: " << sec.count() << " s\n";
+    
     std::cout << "Min: " << min_val << " at (" << min_i << "," << min_j << "," << min_k << ")\n";
     std::cout << "Max: " << max_val << " at (" << max_i << "," << max_j << "," << max_k << ")\n";
     return 0;

@@ -2,13 +2,22 @@
 #include <vector>
 #include <climits>
 #include <omp.h>
+#include <chrono>
 #include "config.hpp"
 
 int main() {
 
     auto a = create_matrix();
-    read_input(a, M, N, P);                      
+    read_input(a, M, N, P);  
+
+    int T = 8;                         
+    omp_set_dynamic(0);                
+    omp_set_num_threads(T);            
     
+    using clock = std::chrono::steady_clock;
+
+    auto t0 = clock::now();
+
     // global (shared) extrema
     int gmin = INT_MAX, gmax = INT_MIN;
     int gmin_i = 0, gmin_j = 0, gmin_k = 0;
@@ -38,6 +47,11 @@ int main() {
         }
     }
 
+    auto t1 = clock::now();
+    std::chrono::duration<double> sec = t1 - t0;
+
+    std::cout << "Elapsed: " << sec.count() << " s\n";
+    
     std::cout << "Min: " << gmin << " at (" << gmin_i << "," << gmin_j << "," << gmin_k << ")\n";
     std::cout << "Max: " << gmax << " at (" << gmax_i << "," << gmax_j << "," << gmax_k << ")\n";
     return 0;

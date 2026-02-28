@@ -4,9 +4,9 @@
 #include <vector>
 #include <random>
 
-constexpr int M = 10;
-constexpr int N = 10;
-constexpr int P = 10;
+constexpr int M = 1000;
+constexpr int N = 1000;
+constexpr int P = 1000;
 
 using Matrix3D = std::vector<std::vector<std::vector<int>>>;
 
