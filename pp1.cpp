@@ -18,14 +18,12 @@ int main() {
 
     auto t0 = clock::now();
 
-    // global (shared) extrema
     int gmin = INT_MAX, gmax = INT_MIN;
     int gmin_i = 0, gmin_j = 0, gmin_k = 0;
     int gmax_i = 0, gmax_j = 0, gmax_k = 0;
 
     #pragma omp parallel
     {
-        // local (private) extrema per thread
         int lmin = INT_MAX, lmax = INT_MIN;
         int lmin_i = 0, lmin_j = 0, lmin_k = 0;
         int lmax_i = 0, lmax_j = 0, lmax_k = 0;
@@ -39,7 +37,6 @@ int main() {
                     if (v > lmax) { lmax = v; lmax_i = i; lmax_j = j; lmax_k = k; }
                 }
 
-        // merge local results into global results safely
         #pragma omp critical
         {
             if (lmin < gmin) { gmin = lmin; gmin_i = lmin_i; gmin_j = lmin_j; gmin_k = lmin_k; }

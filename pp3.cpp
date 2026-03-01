@@ -29,7 +29,6 @@ int main() {
     #pragma omp parallel sections num_threads(outer_threads) default(none) \
         shared(a,M,N,P,maxval,minval,max_i,max_j,max_k,min_i,min_j,min_k,inner_threads)
     {
-        // ---------- MAX ----------
         #pragma omp section
         {
             #pragma omp parallel num_threads(inner_threads) default(none) \
@@ -53,7 +52,6 @@ int main() {
             }
         }
 
-        // ---------- MIN ----------
         #pragma omp section
         {
             #pragma omp parallel num_threads(inner_threads) default(none) \
