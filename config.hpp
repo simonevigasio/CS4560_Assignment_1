@@ -6,7 +6,7 @@
 
 constexpr int M = 1000;
 constexpr int N = 1000;
-constexpr int P = 1000;
+constexpr int P = 1000; 
 
 using Matrix3D = std::vector<std::vector<std::vector<int>>>;
 
@@ -24,7 +24,7 @@ inline void read_input(std::vector<std::vector<std::vector<int>>>& a,
                        unsigned seed = 42)
 {
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<int> dist(0, 100);
+    std::uniform_int_distribution<int> dist(0, 1000);
 
     for (int i = 0; i < M; ++i)
         for (int j = 0; j < N; ++j)

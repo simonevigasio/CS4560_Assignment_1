@@ -1,16 +1,18 @@
 #include <iostream>
 #include <vector>
+#include <climits>
 #include <omp.h>
 #include <algorithm>
 #include <chrono>
 #include "config.hpp"
 
-int main() {
+int main(int argc, char** argv) {
+    int T = 2;
+    if (argc > 1) T = std::stoi(argv[1]);
     
     auto a = create_matrix();
     read_input(a, M, N, P); 
 
-    int T = 16;                         
     omp_set_dynamic(0);                
     omp_set_num_threads(T);            
     omp_set_max_active_levels(2);      
@@ -22,55 +24,64 @@ int main() {
 
     auto t0 = clock::now();
 
-    int maxval = a[0][0][0], minval = a[0][0][0];
-    int max_i=0, max_j=0, max_k=0;
-    int min_i=0, min_j=0, min_k=0;
+    int gmax_i=0, gmax_j=0, gmax_k=0;
+    int gmin_i=0, gmin_j=0, gmin_k=0;
 
-    #pragma omp parallel sections num_threads(outer_threads) default(none) \
-        shared(a,M,N,P,maxval,minval,max_i,max_j,max_k,min_i,min_j,min_k,inner_threads)
+    #pragma omp parallel sections num_threads(outer_threads) 
     {
         #pragma omp section
         {
-            #pragma omp parallel num_threads(inner_threads) default(none) \
-                shared(a,M,N,P,maxval,max_i,max_j,max_k)
+            #pragma omp parallel num_threads(inner_threads) 
             {
-                int local_max = a[0][0][0];
-                int li=0, lj=0, lk=0;
+                int lmax_i=0, lmax_j=0, lmax_k=0;
 
                 #pragma omp for collapse(3) nowait
                 for (int i=0;i<M;i++)
                     for (int j=0;j<N;j++)
                         for (int k=0;k<P;k++) {
                             int v = a[i][j][k];
-                            if (v > local_max) { local_max = v; li=i; lj=j; lk=k; }
+                            if (a[i][j][k] > a[lmax_i][lmax_j][lmax_k]) { 
+                                lmax_i=i; 
+                                lmax_j=j; 
+                                lmax_k=k; 
+                            }
                         }
 
-                #pragma omp critical(max_update)
+                #pragma omp critical
                 {
-                    if (local_max > maxval) { maxval = local_max; max_i=li; max_j=lj; max_k=lk; }
+                    if (a[lmax_i][lmax_j][lmax_k] > a[gmax_i][gmax_j][gmax_k]) { 
+                        gmax_i = lmax_i; 
+                        gmax_j = lmax_j; 
+                        gmax_k = lmax_k; 
+                    }
                 }
             }
         }
 
         #pragma omp section
         {
-            #pragma omp parallel num_threads(inner_threads) default(none) \
-                shared(a,M,N,P,minval,min_i,min_j,min_k)
+            #pragma omp parallel num_threads(inner_threads) 
             {
-                int local_min = a[0][0][0];
-                int li=0, lj=0, lk=0;
+                int lmin_i=0, lmin_j=0, lmin_k=0;
 
                 #pragma omp for collapse(3) nowait
                 for (int i=0;i<M;i++)
                     for (int j=0;j<N;j++)
                         for (int k=0;k<P;k++) {
-                            int v = a[i][j][k];
-                            if (v < local_min) { local_min = v; li=i; lj=j; lk=k; }
+                            if (a[i][j][k] < a[lmin_i][lmin_j][lmin_k]) { 
+                                lmin_i = i; 
+                                lmin_j = j; 
+                                lmin_k = k; 
+                            }
                         }
 
-                #pragma omp critical(min_update)
+                #pragma omp critical
                 {
-                    if (local_min < minval) { minval = local_min; min_i=li; min_j=lj; min_k=lk; }
+                    if (a[lmin_i][lmin_j][lmin_k] < a[gmin_i][gmin_j][gmin_k]) { 
+                        gmin_i = lmin_i; 
+                        gmin_j = lmin_j; 
+                        gmin_k = lmin_k; 
+                    }
                 }
             }
         }
@@ -81,6 +92,7 @@ int main() {
 
     std::cout << "Elapsed: " << sec.count() << " s\n";
 
-    std::cout << "Min: " << minval << " at ("<<min_i<<","<<min_j<<","<<min_k<<")\n";
-    std::cout << "Max: " << maxval << " at ("<<max_i<<","<<max_j<<","<<max_k<<")\n";
+    std::cout << "Min: " << a[gmin_i][gmin_j][gmin_k] << "\n";
+    std::cout << "Max: " << a[gmax_i][gmax_j][gmax_k] << "\n";
+    return 0;
 }

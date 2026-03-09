@@ -39,8 +39,7 @@ int main() {
 
     std::cout << "Elapsed: " << sec.count() << " s\n";
     
-    std::cout << "Min: " << a[min_i][min_j][min_k] << " at (" << min_i << "," << min_j << "," << min_k << ")" << std::endl;
-    std::cout << "Max: " << a[max_i][max_j][max_k] << " at (" << max_i << "," << max_j << "," << max_k << ")" << std::endl;
-
+    std::cout << "Min: " << a[min_i][min_j][min_k] << "\n";
+    std::cout << "Max: " << a[max_i][max_j][max_k] << "\n";
     return 0;
 }
