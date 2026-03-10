@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
             {
                 int lmax_i=0, lmax_j=0, lmax_k=0;
 
-                #pragma omp for collapse(3) nowait
+                #pragma omp for collapse(3) 
                 for (int i=0;i<M;i++)
                     for (int j=0;j<N;j++)
                         for (int k=0;k<P;k++) {
@@ -64,7 +64,7 @@ int main(int argc, char** argv) {
             {
                 int lmin_i=0, lmin_j=0, lmin_k=0;
 
-                #pragma omp for collapse(3) nowait
+                #pragma omp for collapse(3) 
                 for (int i=0;i<M;i++)
                     for (int j=0;j<N;j++)
                         for (int k=0;k<P;k++) {
